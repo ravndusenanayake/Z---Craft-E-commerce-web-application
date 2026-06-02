@@ -19,15 +19,12 @@ function ShopContent() {
   const initialCategory = searchParams.get('category') || 'ALL';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadProducts() {
-      setIsLoading(true);
       const data = await getProducts();
       // Ensure the returned data matches the expected Product interface
       setProducts(data as Product[]);
-      setIsLoading(false);
     }
     loadProducts();
   }, []);

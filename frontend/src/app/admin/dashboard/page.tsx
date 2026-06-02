@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, ChevronDown, CheckCircle, Clock, Truck, Package } from 'lucide-react';
+import { Search, CheckCircle, Clock, Truck, Package } from 'lucide-react';
 import { getOrders, updateOrderStatus } from '@/actions/orders';
 
 // Define the shape of our real order
@@ -12,20 +12,17 @@ type Order = {
   createdAt: Date;
   totalAmount: number;
   status: string;
-  items: any[];
+  items: { productId: string; quantity: number; price: number }[];
 };
 
 export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadOrders() {
-      setIsLoading(true);
       const data = await getOrders();
-      setOrders(data);
-      setIsLoading(false);
+      setOrders(data as Order[]);
     }
     loadOrders();
   }, []);

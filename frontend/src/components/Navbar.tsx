@@ -2,13 +2,18 @@
 
 import Link from 'next/link';
 import { ShoppingBag, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const cartItems = useCartStore((state) => state.items);
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -34,7 +39,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             <Link href="/cart" className="relative p-2 text-foreground/80 hover:text-primary transition-colors">
               <ShoppingBag className="h-6 w-6" />
-              {totalItems > 0 && (
+              {isMounted && totalItems > 0 && (
                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-secondary rounded-full">
                   {totalItems}
                 </span>

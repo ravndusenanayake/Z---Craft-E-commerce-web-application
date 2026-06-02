@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, ArrowRight, ShieldCheck } from 'lucide-react';
@@ -11,6 +11,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +19,10 @@ export default function CartPage() {
     address: '',
     instructions: ''
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +69,9 @@ export default function CartPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <h1 className="text-4xl font-bold mb-12">Shopping Cart</h1>
 
-      {items.length === 0 ? (
+      {!isMounted ? (
+        <div className="text-center py-16">Loading cart...</div>
+      ) : items.length === 0 ? (
         <div className="text-center py-16 glass-effect rounded-2xl border border-border/50">
           <p className="text-xl text-foreground/60 mb-6">Your cart is empty.</p>
           <Link href="/shop">
