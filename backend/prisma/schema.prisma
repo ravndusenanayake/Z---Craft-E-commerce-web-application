@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  category    Category // Enum: GIFT_HAMPERS, RESIN_COASTERS, RESIN_JEWELRY, CUSTOM_KEEPSAKES
+  imageUrl    String
+  inStock     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  OrderItems  OrderItem[]
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  customerName   String
+  email          String
+  phone          String
+  address        String
+  instructions   String?
+  totalAmount    Float
+  status         OrderStatus @default(PENDING) // PENDING, IN_PRODUCTION, SHIPPED, DELIVERED
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float   // Price at the time of purchase
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // Hashed using bcrypt
+}
+
+enum Category {
+  GIFT_HAMPERS
+  RESIN_COASTERS
+  RESIN_JEWELRY
+  CUSTOM_KEEPSAKES
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+}
