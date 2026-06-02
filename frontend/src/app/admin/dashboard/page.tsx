@@ -1,24 +1,42 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, ChevronDown, CheckCircle, Clock, Truck, Package } from 'lucide-react';
+import { getOrders, updateOrderStatus } from '@/actions/orders';
 
-// Mock Data for Admin Dashboard
-const MOCK_ORDERS = [
-  { id: 'ORD-7291', customer: 'Emma Watson', email: 'emma@example.com', date: 'Oct 24, 2023', total: 120.00, status: 'PENDING', items: 1 },
-  { id: 'ORD-7290', customer: 'John Doe', email: 'john@example.com', date: 'Oct 23, 2023', total: 45.00, status: 'IN_PRODUCTION', items: 2 },
-  { id: 'ORD-7289', customer: 'Sarah Smith', email: 'sarah@example.com', date: 'Oct 22, 2023', total: 185.00, status: 'SHIPPED', items: 3 },
-  { id: 'ORD-7288', customer: 'Michael Brown', email: 'mike@example.com', date: 'Oct 21, 2023', total: 60.00, status: 'DELIVERED', items: 1 },
-];
+// Define the shape of our real order
+type Order = {
+  id: string;
+  customerName: string;
+  email: string;
+  createdAt: Date;
+  totalAmount: number;
+  status: string;
+  items: any[];
+};
 
 export default function AdminDashboardPage() {
-  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (id: string, newStatus: string) => {
+  useEffect(() => {
+    async function loadOrders() {
+      setIsLoading(true);
+      const data = await getOrders();
+      setOrders(data);
+      setIsLoading(false);
+    }
+    loadOrders();
+  }, []);
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    // Optimistic update
     setOrders(orders.map(order => 
       order.id === id ? { ...order, status: newStatus } : order
     ));
+    // Actually update DB
+    await updateOrderStatus(id, newStatus);
   };
 
   const getStatusBadge = (status: string) => {
@@ -88,24 +106,26 @@ export default function AdminDashboardPage() {
                 <th className="px-6 py-4 text-sm font-medium text-foreground/70">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/50">
-              {orders
-                .filter(o => o.customer.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase()))
-                .map((order) => (
-                <tr key={order.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium">{order.id}</td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium">{order.customer}</div>
+            <tbody className="divide-y divide-border">
+              {orders.filter(o => o.customerName.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase())).map((order) => (
+                <tr key={order.id} className="hover:bg-muted/50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{order.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80">
+                    <div>{order.customerName}</div>
                     <div className="text-xs text-foreground/50">{order.email}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-foreground/70">{order.date}</td>
-                  <td className="px-6 py-4 text-sm font-semibold">${order.total.toFixed(2)}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80 font-medium">
+                    ${order.totalAmount.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(order.status)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80">
                     <select 
-                      className="text-sm border border-border rounded-md px-2 py-1 bg-background outline-none focus:ring-1 focus:ring-primary"
+                      className="bg-background border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
                       value={order.status}
                       onChange={(e) => handleStatusChange(order.id, e.target.value)}
                     >

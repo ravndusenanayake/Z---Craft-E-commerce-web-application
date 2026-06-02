@@ -1,31 +1,38 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock Data for UI before DB is wired up
-const MOCK_PRODUCTS = [
-  { id: '1', title: 'Luxury Resin Hamper', price: 120.0, category: 'GIFT_HAMPERS', imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80', description: 'A beautifully curated gift hamper featuring our finest handcrafted resin pieces, premium chocolates, and bespoke candles. The perfect luxury gift for any occasion.' },
-  { id: '2', title: 'Ocean Wave Coasters Set of 4', price: 45.0, category: 'RESIN_COASTERS', imageUrl: 'https://images.unsplash.com/photo-1629851722880-b26aeb8f2df9?w=800&q=80', description: 'Bring the ocean to your table with these stunning wave-inspired resin coasters. Heat resistant and highly durable.' },
-  { id: '3', title: 'Botanical Resin Pendant', price: 35.0, category: 'RESIN_JEWELRY', imageUrl: 'https://images.unsplash.com/photo-1599643478514-4a888f615372?w=800&q=80', description: 'Real pressed flowers preserved forever in high-quality UV resin. Comes with a 925 sterling silver chain.' },
-];
+import { getProductById } from '@/actions/products';
+import { Product } from '@/components/ProductCard';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fallback product if not found in mock data
-  const product = MOCK_PRODUCTS.find(p => p.id === params.id) || {
-    id: params.id,
-    title: 'Custom Resin Masterpiece',
-    price: 99.0,
-    category: 'CUSTOM_KEEPSAKES',
-    imageUrl: 'https://images.unsplash.com/photo-1628151015968-3a4429e9ef04?w=800&q=80',
-    description: 'A bespoke resin creation tailored to your exact specifications. Contact us for custom orders.'
-  };
+  useEffect(() => {
+    async function loadProduct() {
+      setIsLoading(true);
+      const data = await getProductById(params.id);
+      if (data) {
+        setProduct(data as Product);
+      }
+      setIsLoading(false);
+    }
+    loadProduct();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="p-20 text-center">Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div className="p-20 text-center">Product not found.</div>;
+  }
 
   const handleAddToCart = () => {
     addItem({

@@ -5,21 +5,42 @@ import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import { createOrder } from '@/actions/orders';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    instructions: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call to save order
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    const result = await createOrder({
+      customerName: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      instructions: formData.instructions,
+      totalAmount: getTotal(),
+      items: items.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price }))
+    });
+
+    setIsSubmitting(false);
+    
+    if (result.success) {
       setOrderComplete(true);
       clearCart();
-    }, 1500);
+    } else {
+      alert("There was an error placing your order. Please try again.");
+    }
   };
 
   if (orderComplete) {
@@ -118,19 +139,19 @@ export default function CartPage() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <input required type="text" placeholder="Full Name" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Full Name" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div>
-                  <input required type="email" placeholder="Email Address" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="Email Address" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div>
-                  <input required type="tel" placeholder="Phone Number" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="Phone Number" className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div>
-                  <textarea required placeholder="Delivery Address" rows={3} className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
+                  <textarea required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Delivery Address" rows={3} className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
                 </div>
                 <div>
-                  <textarea placeholder="Custom Instructions (Optional: Colors, text for resin art)" rows={2} className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
+                  <textarea value={formData.instructions} onChange={e => setFormData({...formData, instructions: e.target.value})} placeholder="Custom Instructions (Optional: Colors, text for resin art)" rows={2} className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
                 </div>
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full h-14 text-lg mt-4">

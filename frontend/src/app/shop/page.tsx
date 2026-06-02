@@ -4,16 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard, { Product } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-
-// Mock Data for UI before DB is wired up
-const MOCK_PRODUCTS: Product[] = [
-  { id: '1', title: 'Luxury Resin Hamper', price: 120.0, category: 'GIFT_HAMPERS', imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80' },
-  { id: '2', title: 'Ocean Wave Coasters Set of 4', price: 45.0, category: 'RESIN_COASTERS', imageUrl: 'https://images.unsplash.com/photo-1629851722880-b26aeb8f2df9?w=800&q=80' },
-  { id: '3', title: 'Botanical Resin Pendant', price: 35.0, category: 'RESIN_JEWELRY', imageUrl: 'https://images.unsplash.com/photo-1599643478514-4a888f615372?w=800&q=80' },
-  { id: '4', title: 'Custom Floral Letters', price: 60.0, category: 'CUSTOM_KEEPSAKES', imageUrl: 'https://images.unsplash.com/photo-1628151015968-3a4429e9ef04?w=800&q=80' },
-  { id: '5', title: 'Minimalist White Coasters', price: 40.0, category: 'RESIN_COASTERS', imageUrl: 'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?w=800&q=80' },
-  { id: '6', title: 'Birthday Bash Hamper', price: 85.0, category: 'GIFT_HAMPERS', imageUrl: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80' },
-];
+import { getProducts } from '@/actions/products';
 
 const CATEGORIES = [
   { id: 'ALL', label: 'All Products' },
@@ -27,10 +18,23 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'ALL';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+      setIsLoading(true);
+      const data = await getProducts();
+      // Ensure the returned data matches the expected Product interface
+      setProducts(data as Product[]);
+      setIsLoading(false);
+    }
+    loadProducts();
+  }, []);
 
   const filteredProducts = activeCategory === 'ALL' 
-    ? MOCK_PRODUCTS 
-    : MOCK_PRODUCTS.filter(p => p.category === activeCategory);
+    ? products 
+    : products.filter(p => p.category === activeCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
