@@ -57,6 +57,38 @@ export async function loginUser(formData: FormData) {
   redirect('/shop');
 }
 
+export async function registerUser(formData: FormData) {
+  const name = formData.get('name') as string;
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!name || !email || !password) {
+    return { error: 'Name, email, and password are required' };
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    return { error: 'Email is already in use' };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  await setSession({ id: user.id, email: user.email, name: user.name, role: 'USER' });
+  
+  redirect('/shop');
+}
+
 export async function logout() {
   await clearSession();
   redirect('/');
