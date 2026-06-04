@@ -3,13 +3,15 @@
 import { useState, useEffect, use } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
-import { Minus, Plus, ShoppingBag, ArrowLeft, Check, Truck, ShieldCheck, Sparkles } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, ArrowLeft, Check, Truck, ShieldCheck, Sparkles, CreditCard } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getProductById } from '@/actions/products';
 import { Product } from '@/components/ProductCard';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
   const [product, setProduct] = useState<Product | null>(null);
@@ -59,6 +61,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
+  const handlePlaceOrder = () => {
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      quantity,
+      imageUrl: product.imageUrl,
+    });
+    router.push('/cart');
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <Link href="/shop" className="inline-flex items-center text-foreground/50 hover:text-primary mb-10 transition-colors uppercase text-sm tracking-widest font-semibold">
@@ -102,34 +115,44 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
              </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
-            <div className="flex items-center bg-card rounded-full border border-border/60 shadow-sm p-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
+            <div className="flex items-center justify-between bg-card rounded-full border border-border/60 shadow-sm p-1 shrink-0 h-16 w-full sm:w-auto">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-12 h-12 flex items-center justify-center rounded-full text-foreground/70 hover:bg-muted hover:text-primary transition-colors"
+                className="w-14 h-14 flex items-center justify-center rounded-full text-foreground/70 hover:bg-muted hover:text-primary transition-colors"
               >
                 <Minus className="h-4 w-4" />
               </button>
               <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
               <button 
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-12 h-12 flex items-center justify-center rounded-full text-foreground/70 hover:bg-muted hover:text-primary transition-colors"
+                className="w-14 h-14 flex items-center justify-center rounded-full text-foreground/70 hover:bg-muted hover:text-primary transition-colors"
               >
                 <Plus className="h-4 w-4" />
               </button>
             </div>
             
-            <Button 
-              onClick={handleAddToCart} 
-              size="lg" 
-              className={`flex-1 h-16 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 ${addedToCart ? 'bg-green-600 hover:bg-green-700' : 'bg-primary hover:bg-primary/90'}`}
-            >
-              {addedToCart ? (
-                <><Check className="h-5 w-5 mr-2" /> Added to Cart</>
-              ) : (
-                <><ShoppingBag className="h-5 w-5 mr-2" /> Add to Cart - ${(product.price * quantity).toFixed(2)}</>
-              )}
-            </Button>
+            <div className="flex flex-1 gap-4">
+              <Button 
+                onClick={handleAddToCart} 
+                size="lg" 
+                variant="outline"
+                className={`flex-1 h-16 text-base rounded-full shadow-sm hover:shadow-md transition-all duration-300 ${addedToCart ? 'border-green-600 text-green-600 hover:bg-green-50' : 'hover:bg-muted'}`}
+              >
+                {addedToCart ? (
+                  <><Check className="h-5 w-5 mr-2" /> Added</>
+                ) : (
+                  <><ShoppingBag className="h-5 w-5 mr-2" /> Add to Cart</>
+                )}
+              </Button>
+              <Button 
+                onClick={handlePlaceOrder} 
+                size="lg" 
+                className="flex-1 h-16 text-base rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 bg-primary hover:bg-primary/90"
+              >
+                <CreditCard className="h-5 w-5 mr-2" /> Place Order
+              </Button>
+            </div>
           </div>
         </div>
       </div>
