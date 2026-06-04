@@ -43,6 +43,22 @@ export default function UserRegister() {
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
+              <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Username</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-foreground/40" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  className="w-full pl-12 pr-4 py-4 rounded-xl border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  placeholder="johndoe123"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

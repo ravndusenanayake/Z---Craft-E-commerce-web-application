@@ -32,15 +32,15 @@ export async function loginAdmin(formData: FormData) {
 }
 
 export async function loginUser(formData: FormData) {
-  const email = formData.get('email') as string;
+  const username = formData.get('username') as string;
   const password = formData.get('password') as string;
 
-  if (!email || !password) {
-    return { error: 'Email and password are required' };
+  if (!username || !password) {
+    return { error: 'Username and password are required' };
   }
 
   const user = await prisma.user.findUnique({
-    where: { email },
+    where: { username },
   });
 
   if (!user) {
@@ -58,26 +58,36 @@ export async function loginUser(formData: FormData) {
 }
 
 export async function registerUser(formData: FormData) {
+  const username = formData.get('username') as string;
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  if (!name || !email || !password) {
-    return { error: 'Name, email, and password are required' };
+  if (!username || !name || !email || !password) {
+    return { error: 'Username, name, email, and password are required' };
   }
 
-  const existingUser = await prisma.user.findUnique({
+  const existingEmail = await prisma.user.findUnique({
     where: { email },
   });
 
-  if (existingUser) {
+  if (existingEmail) {
     return { error: 'Email is already in use' };
+  }
+  
+  const existingUsername = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (existingUsername) {
+    return { error: 'Username is already taken' };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
     data: {
+      username,
       name,
       email,
       password: hashedPassword,
