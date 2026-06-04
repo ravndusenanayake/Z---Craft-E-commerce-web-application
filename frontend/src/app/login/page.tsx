@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { loginUser } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
-import { Mail, Lock } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UserLogin() {
@@ -43,17 +43,17 @@ export default function UserLogin() {
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Email</label>
+              <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-foreground/40" />
+                  <User className="h-5 w-5 text-foreground/40" />
                 </div>
                 <input
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="username"
                   required
                   className="w-full pl-12 pr-4 py-4 rounded-xl border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  placeholder="you@example.com"
+                  placeholder="Enter your username"
                 />
               </div>
             </div>
