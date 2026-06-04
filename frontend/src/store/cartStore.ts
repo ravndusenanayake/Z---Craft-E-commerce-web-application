@@ -23,24 +23,25 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       addItem: (item) => set((state) => {
-        const existingItem = state.items.find((i) => i.id === item.id);
+        const currentItems = state.items || [];
+        const existingItem = currentItems.find((i) => i.id === item.id);
         if (existingItem) {
           return {
-            items: state.items.map((i) =>
+            items: currentItems.map((i) =>
               i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
             ),
           };
         }
-        return { items: [...state.items, item] };
+        return { items: [...currentItems, item] };
       }),
       removeItem: (id) => set((state) => ({
-        items: state.items.filter((i) => i.id !== id),
+        items: (state.items || []).filter((i) => i.id !== id),
       })),
       updateQuantity: (id, quantity) => set((state) => ({
-        items: state.items.map((i) => (i.id === id ? { ...i, quantity } : i)),
+        items: (state.items || []).map((i) => (i.id === id ? { ...i, quantity } : i)),
       })),
       clearCart: () => set({ items: [] }),
-      getTotal: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
+      getTotal: () => (get().items || []).reduce((total, item) => total + item.price * item.quantity, 0),
     }),
     {
       name: 'zcraft-cart-storage',

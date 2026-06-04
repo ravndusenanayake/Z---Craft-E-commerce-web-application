@@ -1,7 +1,11 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { useCartStore } from '@/store/cartStore';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
 
 export interface Product {
   id: string;
@@ -18,9 +22,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     addItem({
       id: product.id,
       title: product.title,
@@ -28,6 +34,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       imageUrl: product.imageUrl,
     });
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
@@ -64,9 +72,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-auto">
           <Button 
             onClick={handleAddToCart}
-            className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md hover:shadow-lg rounded-full"
+            className={`w-full mt-4 transition-all shadow-md hover:shadow-lg rounded-full ${
+              isAdded 
+                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+            }`}
           >
-            Add to Cart
+            {isAdded ? (
+              <><Check className="h-4 w-4 mr-2" /> Added</>
+            ) : (
+              'Add to Cart'
+            )}
           </Button>
         </div>
       </div>
