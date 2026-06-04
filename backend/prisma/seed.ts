@@ -101,12 +101,13 @@ async function main() {
 
   await prisma.user.create({
     data: {
+      username: 'customer1',
       name: 'Customer',
       email: 'user@example.com',
       password: userPassword,
     }
   });
-  console.log('Created default user: user@example.com / user123');
+  console.log('Created default user: customer1 / user123');
   
   const createdProducts = [];
   
