@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
@@ -8,7 +8,8 @@ import Link from 'next/link';
 import { getProductById } from '@/actions/products';
 import { Product } from '@/components/ProductCard';
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
   const [product, setProduct] = useState<Product | null>(null);
@@ -17,14 +18,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   useEffect(() => {
     async function loadProduct() {
       setIsLoading(true);
-      const data = await getProductById(params.id);
+      const data = await getProductById(id);
       if (data) {
         setProduct(data as Product);
       }
       setIsLoading(false);
     }
     loadProduct();
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return <div className="p-20 text-center">Loading product...</div>;
