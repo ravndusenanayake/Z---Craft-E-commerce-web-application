@@ -13,7 +13,7 @@ model Product {
   title       String
   description String
   price       Float
-  category    String   // GIFT_HAMPERS, RESIN_COASTERS, RESIN_JEWELRY, CUSTOM_KEEPSAKES
+  category    Category // Enum: GIFT_HAMPERS, RESIN_COASTERS, RESIN_JEWELRY, CUSTOM_KEEPSAKES
   imageUrl    String
   inStock     Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -29,7 +29,7 @@ model Order {
   address        String
   instructions   String?
   totalAmount    Float
-  status         String      @default("PENDING") // PENDING, IN_PRODUCTION, SHIPPED, DELIVERED
+  status         OrderStatus @default(PENDING) // PENDING, IN_PRODUCTION, SHIPPED, DELIVERED
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   items          OrderItem[]
@@ -40,7 +40,7 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
-  price     Float   
+  price     Float   // Price at the time of purchase
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
 }
@@ -51,6 +51,25 @@ model Inquiry {
   email     String
   subject   String
   message   String
-  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // Hashed using bcrypt
+}
+
+enum Category {
+  GIFT_HAMPERS
+  RESIN_COASTERS
+  RESIN_JEWELRY
+  CUSTOM_KEEPSAKES
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
 }

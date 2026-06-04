@@ -31,7 +31,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative rounded-xl overflow-hidden glass-effect border border-border/40 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <div className="group relative rounded-xl overflow-hidden glass-effect border border-border/40 hover-lift flex flex-col h-full">
       <Link href={`/product/${product.id}`} className="block aspect-square relative overflow-hidden bg-muted">
         <div className="absolute inset-0 bg-secondary/10 group-hover:bg-transparent transition-colors z-10" />
         {product.imageUrl ? (
@@ -47,7 +47,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </Link>
       
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-primary mb-1 block">
@@ -61,13 +61,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           <span className="font-bold text-lg text-foreground">${product.price.toFixed(2)}</span>
         </div>
-        
-        <Button 
-          onClick={handleAddToCart}
-          className="w-full mt-4 bg-primary hover:bg-primary/90 text-white transition-all shadow-md hover:shadow-lg"
-        >
-          Add to Cart
-        </Button>
+        <div className="mt-auto">
+          <Button 
+            onClick={handleAddToCart}
+            className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md hover:shadow-lg rounded-full"
+          >
+            Add to Cart
+          </Button>
+        </div>
       </div>
     </div>
   );

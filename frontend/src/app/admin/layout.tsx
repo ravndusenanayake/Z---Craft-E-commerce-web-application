@@ -15,26 +15,26 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border/40 hidden md:block">
-        <div className="p-6">
-          <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+      <aside className="w-64 bg-card border-r border-border/40 hidden md:flex md:flex-col shadow-2xl relative z-20">
+        <div className="p-8 border-b border-border/40">
+          <Link href="/" className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent-600">
             Z Craft Admin
           </Link>
         </div>
         
-        <nav className="mt-6 px-4 space-y-2">
-          <Link href="/admin/dashboard" className="flex items-center px-4 py-3 text-foreground/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+        <nav className="mt-8 px-4 flex-1 space-y-2">
+          <Link href="/admin/dashboard" className="flex items-center px-4 py-3 text-foreground/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all font-medium">
             <LayoutDashboard className="h-5 w-5 mr-3" />
             Dashboard
           </Link>
-          <Link href="/admin/inquiries" className="flex items-center px-4 py-3 text-foreground/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+          <Link href="/admin/inquiries" className="flex items-center px-4 py-3 text-foreground/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all font-medium">
             <MessageSquare className="h-5 w-5 mr-3" />
             Inquiries
           </Link>
         </nav>
         
-        <div className="absolute bottom-0 w-64 p-4 border-t border-border/40">
-          <Link href="/admin/login" className="flex items-center px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors">
+        <div className="p-4 border-t border-border/40 mt-auto">
+          <Link href="/admin/login" className="flex items-center px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-medium">
             <LogOut className="h-5 w-5 mr-3" />
             Logout
           </Link>

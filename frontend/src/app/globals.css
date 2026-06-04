@@ -1,77 +1,116 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #f0fdfa;
-  --color-brand-100: #ccfbf1;
-  --color-brand-200: #99f6e4;
-  --color-brand-300: #5eead4;
-  --color-brand-400: #2dd4bf;
-  --color-brand-500: #14b8a6;
-  --color-brand-600: #0d9488;
-  --color-brand-700: #0f766e;
-  --color-brand-800: #115e59;
-  --color-brand-900: #134e4a;
+  --color-brand-50: #fbf8f3;
+  --color-brand-100: #f5ede1;
+  --color-brand-200: #ead8c2;
+  --color-brand-300: #dcbfa0;
+  --color-brand-400: #cea078;
+  --color-brand-500: #c28254;
+  --color-brand-600: #b56c45;
+  --color-brand-700: #97553b;
+  --color-brand-800: #7a4634;
+  --color-brand-900: #623a2d;
   
-  --color-accent-500: #8b5cf6;
-  --color-accent-600: #7c3aed;
-  
-  --color-gold-400: #fbbf24;
-  --color-gold-500: #f59e0b;
+  --color-accent-400: #fde68a;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
 }
 
 :root {
   --background: #fafaf9;
-  --foreground: #1c1917;
+  --foreground: #292524;
   
   --card: #ffffff;
-  --card-foreground: #1c1917;
+  --card-foreground: #292524;
   
-  --primary: var(--color-brand-600);
+  --primary: var(--color-brand-800);
   --primary-foreground: #ffffff;
   
-  --secondary: var(--color-accent-500);
-  --secondary-foreground: #ffffff;
+  --secondary: var(--color-brand-100);
+  --secondary-foreground: var(--color-brand-900);
   
   --border: #e7e5e4;
+  
+  --radius: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0c0a09;
-    --foreground: #fafaf9;
+    --background: #111111;
+    --foreground: #f5f5f4;
     
-    --card: #1c1917;
-    --card-foreground: #fafaf9;
+    --card: #1a1a1a;
+    --card-foreground: #f5f5f4;
     
-    --primary: var(--color-brand-500);
-    --primary-foreground: #000000;
+    --primary: var(--color-brand-400);
+    --primary-foreground: #111111;
     
-    --secondary: var(--color-accent-400);
-    --secondary-foreground: #000000;
+    --secondary: #222222;
+    --secondary-foreground: var(--color-brand-200);
     
-    --border: #292524;
+    --border: #2a2a2a;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* Custom Resin Glassmorphism Effect */
+/* Premium Glassmorphism Effect */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   .glass-effect {
-    background: rgba(28, 25, 23, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 30, 30, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Utility Animations */
+.animate-blob {
+  animation: blob 10s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+/* Smooth transitions for interactive elements */
+a, button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);
+}
+@media (prefers-color-scheme: dark) {
+  .hover-lift:hover {
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.6);
   }
 }
