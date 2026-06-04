@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { loginAdmin } from '@/actions/auth';
+import { loginUser } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
-import { Lock, User } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 
-export default function AdminLogin() {
+export default function UserLogin() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,7 +15,7 @@ export default function AdminLogin() {
     setIsLoading(true);
     setError(null);
     const formData = new FormData(e.currentTarget);
-    const result = await loginAdmin(formData);
+    const result = await loginUser(formData);
     
     if (result?.error) {
       setError(result.error);
@@ -31,8 +31,8 @@ export default function AdminLogin() {
           <Link href="/" className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary inline-block mb-4">
             Z Craft
           </Link>
-          <h1 className="text-4xl font-black tracking-tight mb-2">Admin Portal</h1>
-          <p className="text-foreground/70">Sign in to access the control panel</p>
+          <h1 className="text-4xl font-black tracking-tight mb-2">Welcome Back</h1>
+          <p className="text-foreground/70">Sign in to your customer account</p>
         </div>
 
         <div className="glass-effect rounded-3xl border border-border/40 p-8 shadow-2xl">
@@ -43,17 +43,17 @@ export default function AdminLogin() {
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Username</label>
+              <label className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-foreground/40" />
+                  <Mail className="h-5 w-5 text-foreground/40" />
                 </div>
                 <input
-                  type="text"
-                  name="username"
+                  type="email"
+                  name="email"
                   required
                   className="w-full pl-12 pr-4 py-4 rounded-xl border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  placeholder="Enter admin username"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>
@@ -79,9 +79,13 @@ export default function AdminLogin() {
               disabled={isLoading}
               className="w-full h-14 text-lg rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl transition-all"
             >
-              {isLoading ? 'Authenticating...' : 'Sign In'}
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
+          
+          <div className="mt-8 text-center text-sm text-foreground/70">
+            Don't have an account? <span className="text-primary font-semibold hover:underline cursor-pointer">Register (Coming soon)</span>
+          </div>
         </div>
       </div>
     </div>

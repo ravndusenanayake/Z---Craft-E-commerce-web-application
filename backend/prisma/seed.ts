@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+import bcrypt from 'bcryptjs';
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
@@ -82,6 +84,29 @@ async function main() {
   await prisma.order.deleteMany();
   await prisma.inquiry.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.admin.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Create Default Admin and User
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  const userPassword = await bcrypt.hash('user123', 10);
+
+  await prisma.admin.create({
+    data: {
+      username: 'admin',
+      password: adminPassword,
+    }
+  });
+  console.log('Created default admin: admin / admin123');
+
+  await prisma.user.create({
+    data: {
+      name: 'Customer',
+      email: 'user@example.com',
+      password: userPassword,
+    }
+  });
+  console.log('Created default user: user@example.com / user123');
   
   const createdProducts = [];
   

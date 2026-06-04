@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Package, MessageSquare, LogOut, LayoutDashboard } from 'lucide-react';
+import { logout } from '@/actions/auth';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Z Craft',
@@ -34,10 +35,12 @@ export default function AdminLayout({
         </nav>
         
         <div className="p-4 border-t border-border/40 mt-auto">
-          <Link href="/admin/login" className="flex items-center px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-medium">
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </Link>
+          <form action={logout}>
+            <button type="submit" className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-medium">
+              <LogOut className="h-5 w-5 mr-3" />
+              Logout
+            </button>
+          </form>
         </div>
       </aside>
 
