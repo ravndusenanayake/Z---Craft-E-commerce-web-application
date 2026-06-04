@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { setSession, clearSession } from '@/lib/auth';
+import { setSession, clearSession, getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
 export async function loginAdmin(formData: FormData) {
