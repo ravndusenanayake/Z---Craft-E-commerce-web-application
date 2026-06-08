@@ -82,3 +82,34 @@ model User {
   password  String   // Hashed using bcrypt
   createdAt DateTime @default(now())
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  username  String?
+  action    String
+  details   String
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  eventType   String
+  page        String
+  sessionId   String?
+  userId      String?
+  metadata    String?
+  createdAt   DateTime @default(now())
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  category  String
+  sizeBytes Int
+  mimeType  String
+  createdAt DateTime @default(now())
+}
+
