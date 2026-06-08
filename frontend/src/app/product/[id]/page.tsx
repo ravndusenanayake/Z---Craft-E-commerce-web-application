@@ -12,6 +12,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getProductById } from '@/actions/products';
 import { Product } from '@/components/ProductCard';
+import ProductReviews from '@/components/ProductReviews';
+import { getReviews } from '@/actions/reviews';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -27,6 +29,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   // Custom design states
   const [activeView, setActiveView] = useState<'default' | 'macro' | 'flatlay' | 'golden'>('default');
   const [activeFinish, setActiveFinish] = useState<'gloss' | 'matte' | 'gold_rimmed'>('gloss');
+  
+  // Live review stats (avg + count from DB)
+  const [reviewStats, setReviewStats] = useState({ avgRating: 4.2, count: 0 });
   
   // Dynamic location states
   const [location, setLocation] = useState('Sabaragamuwa, Kegalle, Warakapola');
@@ -44,6 +49,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       const data = await getProductById(id);
       if (data) {
         setProduct(data as Product);
+        // Load live review stats in parallel
+        const stats = await getReviews(id);
+        if (stats.count > 0) {
+          setReviewStats({ avgRating: stats.avgRating, count: stats.count });
+        }
       }
       setIsLoading(false);
     }
@@ -261,19 +271,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {product.title}
           </h1>
           
-          {/* Ratings & Share Bar */}
+          {/* Ratings & Share Bar — live from DB */}
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/40">
             <div className="flex items-center gap-2.5">
               <div className="flex text-amber-500">
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 text-border fill-current dark:text-zinc-800" />
+                {[1,2,3,4,5].map(s => (
+                  <Star
+                    key={s}
+                    className={`w-4 h-4 ${
+                      s <= Math.round(reviewStats.avgRating)
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-border fill-border dark:text-zinc-800 dark:fill-zinc-800'
+                    }`}
+                  />
+                ))}
               </div>
-              <span className="text-xs font-medium text-foreground/50 bg-secondary/50 px-2 py-0.5 rounded-full">
-                80 Reviews
-              </span>
+              <button
+                onClick={() => document.getElementById('product-reviews')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-xs font-medium text-foreground/50 bg-secondary/50 px-2 py-0.5 rounded-full hover:text-primary transition-colors"
+              >
+                {reviewStats.count > 0 ? `${reviewStats.count} Review${reviewStats.count !== 1 ? 's' : ''}` : 'No reviews yet'}
+              </button>
             </div>
             <div className="flex items-center gap-3">
               <button className="text-foreground/50 hover:text-primary transition-colors p-1.5 hover:bg-secondary/40 rounded-full" title="Share Product">
@@ -548,6 +566,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
           
         </div>
+      </div>
+
+      {/* ── Reviews Section ── */}
+      <div id="product-reviews">
+        <ProductReviews productId={id} />
       </div>
     </div>
   );
