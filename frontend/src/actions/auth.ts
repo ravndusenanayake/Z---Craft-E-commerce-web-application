@@ -39,22 +39,37 @@ export async function loginUser(formData: FormData) {
     return { error: 'Username and password are required' };
   }
 
+  // 1. Check if user exists in the User table
   const user = await prisma.user.findUnique({
     where: { username },
   });
 
-  if (!user) {
-    return { error: 'Invalid credentials' };
+  if (user) {
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return { error: 'Invalid credentials' };
+    }
+
+    await setSession({ id: user.id, email: user.email, name: user.name, role: 'USER' });
+    redirect('/shop');
   }
 
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) {
-    return { error: 'Invalid credentials' };
+  // 2. Check if user exists in the Admin table
+  const admin = await prisma.admin.findUnique({
+    where: { username },
+  });
+
+  if (admin) {
+    const isValid = await bcrypt.compare(password, admin.password);
+    if (!isValid) {
+      return { error: 'Invalid credentials' };
+    }
+
+    await setSession({ id: admin.id, username: admin.username, role: 'ADMIN' });
+    redirect('/admin/dashboard');
   }
 
-  await setSession({ id: user.id, email: user.email, name: user.name, role: 'USER' });
-  
-  redirect('/shop');
+  return { error: 'Invalid credentials' };
 }
 
 export async function registerUser(formData: FormData) {
