@@ -4,7 +4,7 @@ import { decrypt } from '@/lib/auth';
 
 const protectedRoutes = ['/admin/dashboard'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   
   // Protect admin routes
