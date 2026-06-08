@@ -29,7 +29,7 @@ interface Order {
   id: string;
   customerName: string;
   email: string;
-  createdAt: string;
+  createdAt: string | Date;
   totalAmount: number;
   status: string;
   items: { productId: string; quantity: number; price: number }[];
@@ -43,7 +43,7 @@ interface Product {
   category: string;
   imageUrl: string;
   inStock: boolean;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface AuditLog {
@@ -53,7 +53,7 @@ interface AuditLog {
   action: string;
   details: string;
   ipAddress: string | null;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface AnalyticsEvent {
@@ -63,7 +63,7 @@ interface AnalyticsEvent {
   sessionId: string | null;
   userId: string | null;
   metadata: string | null;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface MediaAsset {
@@ -73,7 +73,7 @@ interface MediaAsset {
   category: string;
   sizeBytes: number;
   mimeType: string;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface User {
@@ -81,7 +81,7 @@ interface User {
   username: string;
   name: string;
   email: string;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface Admin {
