@@ -28,14 +28,27 @@ export default function CartPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Package product variation details to include in instructions
+    const finishDetails = items
+      .map(i => {
+        const finishMatch = i.title.match(/\(([^)]+)\)/);
+        const name = i.title.split(' (')[0];
+        return finishMatch ? `${i.quantity}x ${name} [${finishMatch[1]}]` : `${i.quantity}x ${i.title}`;
+      })
+      .join(', ');
+
+    const finalInstructions = formData.instructions
+      ? `${formData.instructions} | Selected Finishes: ${finishDetails}`
+      : `Selected Finishes: ${finishDetails}`;
+
     const result = await createOrder({
       customerName: formData.name,
       email: formData.email,
       phone: formData.phone,
       address: formData.address,
-      instructions: formData.instructions,
+      instructions: finalInstructions,
       totalAmount: getTotal(),
-      items: items.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price }))
+      items: items.map(i => ({ productId: i.id.split('-')[0], quantity: i.quantity, price: i.price }))
     });
 
     setIsSubmitting(false);
@@ -44,7 +57,7 @@ export default function CartPage() {
       setOrderComplete(true);
       clearCart();
     } else {
-      alert("There was an error placing your order. Please try again.");
+      alert(result.error || "There was an error placing your order. Please try again.");
     }
   };
 

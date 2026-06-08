@@ -14,6 +14,25 @@ export async function createOrder(data: {
   items: { productId: string; quantity: number; price: number }[];
 }) {
   try {
+    // Validate that all products exist in the database
+    const productIds = data.items.map(item => item.productId);
+    const existingProducts = await prisma.product.findMany({
+      where: {
+        id: { in: productIds }
+      },
+      select: { id: true, title: true }
+    });
+
+    const existingProductIds = new Set(existingProducts.map(p => p.id));
+    const missingProductIds = productIds.filter(id => !existingProductIds.has(id));
+
+    if (missingProductIds.length > 0) {
+      return { 
+        success: false, 
+        error: "One or more products in your cart are no longer available. Please clear your cart and add the items again." 
+      };
+    }
+
     const order = await prisma.order.create({
       data: {
         customerName: data.customerName,
@@ -37,7 +56,7 @@ export async function createOrder(data: {
     return { success: true, orderId: order.id };
   } catch (error) {
     console.error("Failed to create order", error);
-    return { success: false, error: "Failed to create order" };
+    return { success: false, error: "An unexpected error occurred while placing your order. Please try again." };
   }
 }
 
