@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { OrderStatus } from "@prisma/client";
 
 export async function createOrder(data: {
   customerName: string;
@@ -44,7 +45,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
   try {
     await prisma.order.update({
       where: { id: orderId },
-      data: { status }
+      data: { status: status as OrderStatus }
     });
     revalidatePath('/admin/dashboard');
     return { success: true };

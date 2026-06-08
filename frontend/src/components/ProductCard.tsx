@@ -14,6 +14,7 @@ export interface Product {
   category: string;
   imageUrl: string;
   description?: string;
+  inStock?: boolean;
 }
 
 interface ProductCardProps {
