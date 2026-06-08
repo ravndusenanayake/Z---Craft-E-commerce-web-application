@@ -10,7 +10,7 @@ const DUMMY_PRODUCTS = [
     description: "A set of 4 handcrafted resin coasters featuring a stunning ocean wave design. Made with premium heat-resistant epoxy and real sand.",
     price: 35.00,
     category: "RESIN_COASTERS",
-    imageUrl: "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/ocean_breeze_coasters.png",
     inStock: true
   },
   {
@@ -18,7 +18,7 @@ const DUMMY_PRODUCTS = [
     description: "Luxurious geode-style coasters embedded with authentic 24k gold flakes. Perfect for adding a touch of elegance to your coffee table.",
     price: 45.00,
     category: "RESIN_COASTERS",
-    imageUrl: "https://images.unsplash.com/photo-1582716401301-b2407dc7563d?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/gold_flake_geode_coasters.png",
     inStock: true
   },
   {
@@ -26,7 +26,7 @@ const DUMMY_PRODUCTS = [
     description: "A delicate dried rose petal preserved forever in crystal clear UV resin. Comes with a 925 sterling silver chain.",
     price: 55.00,
     category: "RESIN_JEWELRY",
-    imageUrl: "https://images.unsplash.com/photo-1599643478524-fb524b21559e?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/floral_pendant.png",
     inStock: true
   },
   {
@@ -34,7 +34,7 @@ const DUMMY_PRODUCTS = [
     description: "Handcrafted resin ring featuring deep space colors and holographic glitters. Each piece is entirely unique.",
     price: 25.00,
     category: "RESIN_JEWELRY",
-    imageUrl: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/galaxy_ring.png",
     inStock: true
   },
   {
@@ -42,7 +42,7 @@ const DUMMY_PRODUCTS = [
     description: "The ultimate relaxation package. Includes artisan soaps, bath bombs, a custom resin soap dish, and a plush face towel.",
     price: 85.00,
     category: "GIFT_HAMPERS",
-    imageUrl: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/spa_hamper.png",
     inStock: true
   },
   {
@@ -50,7 +50,7 @@ const DUMMY_PRODUCTS = [
     description: "Curated for the coffee enthusiast. Features premium roasted beans, a custom resin coaster, and a ceramic mug.",
     price: 65.00,
     category: "GIFT_HAMPERS",
-    imageUrl: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/coffee_hamper.png",
     inStock: true
   },
   {
@@ -58,7 +58,7 @@ const DUMMY_PRODUCTS = [
     description: "Custom service to preserve your wedding flowers in a large, crystal clear resin block. A timeless keepsake.",
     price: 150.00,
     category: "CUSTOM_KEEPSAKES",
-    imageUrl: "https://images.unsplash.com/photo-1550005809-91ad75fb315f?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/wedding_block.png",
     inStock: true
   },
   {
@@ -66,7 +66,7 @@ const DUMMY_PRODUCTS = [
     description: "A beautiful custom heart-shaped resin piece preserving your pet's ashes or fur, mixed with subtle colors of your choice.",
     price: 75.00,
     category: "CUSTOM_KEEPSAKES",
-    imageUrl: "https://images.unsplash.com/photo-1518049362265-d5b2a6467637?auto=format&fit=crop&q=80&w=1000",
+    imageUrl: "/images/pet_heart.png",
     inStock: true
   }
 ];
