@@ -19,6 +19,7 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   OrderItems  OrderItem[]
+  reviews     Review[]
 }
 
 model Order {
@@ -51,6 +52,17 @@ model Inquiry {
   email     String
   subject   String
   message   String
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  rating    Int      // 1–5 stars
+  comment   String
   createdAt DateTime @default(now())
 }
 
