@@ -7,8 +7,22 @@ import {
   Upload, Activity, CheckCircle, Clock, Truck, Package, 
   Edit, Shield, ArrowRight, UserPlus, Info, Check, Copy, RefreshCw
 } from 'lucide-react';
+import { getOrders, updateOrderStatus } from '@/actions/orders';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '@/actions/products';
 
 const API_BASE_URL = 'http://localhost:5000/api/v1';
+
+// Safe JSON fetch — returns null if response is not valid JSON or request fails
+async function safeFetch(url: string, options?: RequestInit) {
+  try {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 // Types definitions
 interface Order {
@@ -120,42 +134,23 @@ export default function AdminDashboardPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Load dashboard dataset
+  // Load dashboard dataset — uses server actions (Prisma) as primary source
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // 1. Load Orders
-      const resOrders = await fetch(`${API_BASE_URL}/orders`);
-      const dataOrders = await resOrders.json();
-      if (dataOrders.success) setOrders(dataOrders.data);
+      // 1. Orders & Products — load via Next.js server actions (direct Prisma, always available)
+      const [dbOrders, dbProducts] = await Promise.all([
+        getOrders(),
+        getProducts()
+      ]);
+      const ordersData = (dbOrders as Order[]) || [];
+      const productsData = (dbProducts as Product[]) || [];
+      setOrders(ordersData);
+      setProducts(productsData);
 
-      // 2. Load Products
-      const resProducts = await fetch(`${API_BASE_URL}/products`);
-      const dataProducts = await resProducts.json();
-      if (dataProducts.success) setProducts(dataProducts.data);
-
-      // 3. Load Media Assets
-      const resMedia = await fetch(`${API_BASE_URL}/media`);
-      const dataMedia = await resMedia.json();
-      if (dataMedia.success) setMediaAssets(dataMedia.data);
-
-      // 4. Load Audit Logs
-      const resAudit = await fetch(`${API_BASE_URL}/audit-logs`);
-      const dataAudit = await resAudit.json();
-      if (dataAudit.success) setAuditLogs(dataAudit.data);
-
-      // 5. Load Analytics Events
-      const resEvents = await fetch(`${API_BASE_URL}/analytics/dashboard`);
-      const dataEvents = await resEvents.json();
-      // Load raw event log list too
-      const resRawEvents = await fetch(`${API_BASE_URL}/audit-logs`); // using standard logger as placeholder for events listing
-      setAnalyticsEvents([]); // initialized dynamically
-
-      // Load Users / Admins from Next.js server actions / local mocks
-      // We can also fetch them dynamically
-      const userRes = await fetch(`${API_BASE_URL}/orders`); // placeholder to avoid crash, we will construct dummy users from unique emails in orders!
+      // 2. Derive users list from unique order emails
       const uniqueUsersMap = new Map<string, User>();
-      dataOrders.data?.forEach((o: Order, index: number) => {
+      ordersData.forEach((o: Order, index: number) => {
         if (!uniqueUsersMap.has(o.email)) {
           uniqueUsersMap.set(o.email, {
             id: `usr_${index}`,
@@ -169,9 +164,18 @@ export default function AdminDashboardPage() {
       setUsers(Array.from(uniqueUsersMap.values()));
       setAdmins([{ id: 'adm_1', username: 'admin' }]);
 
+      // 3. Backend extras — try independently; silently skip if backend is offline
+      const [dataMedia, dataAudit] = await Promise.all([
+        safeFetch(`${API_BASE_URL}/media`),
+        safeFetch(`${API_BASE_URL}/audit-logs`),
+      ]);
+      if (dataMedia?.success) setMediaAssets(dataMedia.data);
+      if (dataAudit?.success) setAuditLogs(dataAudit.data);
+      setAnalyticsEvents([]);
+
     } catch (error) {
-      console.error('Failed to fetch dashboard dataset', error);
-      showToast('Connection to backend API failed', 'error');
+      console.error('Failed to load dashboard dataset', error);
+      showToast('Failed to load dashboard data', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -181,19 +185,29 @@ export default function AdminDashboardPage() {
     loadData();
   }, []);
 
-  // Update order status controller
+  // Update order status controller — uses server action (Prisma) with backend as fallback
   const handleUpdateStatus = async (orderId: string, status: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+      // Try server action first (always available)
+      const result = await updateOrderStatus(orderId, status);
+      if (result.success) {
+        setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
+        showToast(`Order status updated to ${status}`);
+        loadData();
+        return;
+      }
+      // Fallback: try backend API
+      const data = await safeFetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
-      const data = await res.json();
-      if (data.success) {
+      if (data?.success) {
         setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
         showToast(`Order status updated to ${status}`);
         loadData();
+      } else {
+        showToast('Failed to update order status', 'error');
       }
     } catch (error) {
       showToast('Failed to update status', 'error');
@@ -276,7 +290,7 @@ export default function AdminDashboardPage() {
     reader.readAsDataURL(file);
   };
 
-  // Products CRUD: Save Product
+  // Products CRUD: Save Product — uses server actions (always available)
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productForm.title || !productForm.price || !productForm.imageUrl) {
@@ -284,26 +298,28 @@ export default function AdminDashboardPage() {
     }
 
     setIsLoading(true);
-    const url = editingProduct 
-      ? `${API_BASE_URL}/products/${editingProduct.id}`
-      : `${API_BASE_URL}/products`;
-    const method = editingProduct ? 'PUT' : 'POST';
+    const productData = {
+      title: productForm.title,
+      description: productForm.description,
+      price: parseFloat(productForm.price),
+      category: productForm.category,
+      imageUrl: productForm.imageUrl,
+      inStock: productForm.inStock
+    };
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productForm)
-      });
-      const data = await res.json();
-      if (data.success) {
+      const result = editingProduct
+        ? await updateProduct(editingProduct.id, productData)
+        : await createProduct(productData);
+
+      if (result.success) {
         showToast(editingProduct ? 'Product updated successfully' : 'Product created successfully');
         setIsProductModalOpen(false);
         setEditingProduct(null);
         setProductForm({ title: '', description: '', price: '', category: 'GIFT_HAMPERS', imageUrl: '', inStock: true });
         loadData();
       } else {
-        showToast(data.message || 'Operation failed', 'error');
+        showToast((result as any).error || 'Operation failed', 'error');
       }
     } catch (e) {
       showToast('Save product request failed', 'error');
@@ -312,16 +328,17 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Products CRUD: Delete Product
+  // Products CRUD: Delete Product — uses server action (always available)
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('Are you sure you want to delete this product? This cannot be undone.')) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/products/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
+      const result = await deleteProduct(id);
+      if (result.success) {
         showToast('Product deleted successfully');
         loadData();
+      } else {
+        showToast((result as any).error || 'Failed to delete product', 'error');
       }
     } catch (e) {
       showToast('Delete request failed', 'error');
