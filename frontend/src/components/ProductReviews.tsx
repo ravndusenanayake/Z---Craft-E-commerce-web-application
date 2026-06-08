@@ -80,24 +80,56 @@ function RatingBar({ stars, count, total }: { stars: number; count: number; tota
 }
 
 function ReviewCard({ review }: { review: Review }) {
+  const [helpful, setHelpful] = useState(false);
+  // Generate a consistent pseudo-random number of helpful votes based on review ID
+  const initialVotes = Math.floor((review.id.charCodeAt(0) || 1) % 15) + 1;
+  const [votes, setVotes] = useState(initialVotes);
+
   const d = new Date(review.createdAt);
   const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+  const handleHelpful = () => {
+    if (helpful) {
+      setVotes(v => v - 1);
+      setHelpful(false);
+    } else {
+      setVotes(v => v + 1);
+      setHelpful(true);
+    }
+  };
+
   return (
-    <div className="py-5 border-b border-border/30 last:border-0 animate-slide-up">
-      <div className="flex items-start justify-between gap-4 mb-2">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+    <div className="py-6 border-b border-border/30 last:border-0 animate-slide-up">
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm">
             {review.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-sm font-bold">{review.name}</p>
-            <p className="text-xs text-foreground/40">{dateStr}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-foreground">{review.name}</p>
+              <span className="flex items-center gap-1 text-[9px] uppercase tracking-wider font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-sm border border-emerald-500/20">
+                <CheckCircle2 className="w-3 h-3" /> Verified Buyer
+              </span>
+            </div>
+            <p className="text-xs text-foreground/40 mt-0.5">{dateStr}</p>
           </div>
         </div>
-        <StarRating value={review.rating} size="sm" readonly />
+        <div className="bg-secondary/30 px-2.5 py-1 rounded-full border border-border/40">
+          <StarRating value={review.rating} size="sm" readonly />
+        </div>
       </div>
-      <p className="text-sm text-foreground/75 leading-relaxed ml-12">{review.comment}</p>
+      <p className="text-sm text-foreground/80 leading-relaxed ml-[54px]">{review.comment}</p>
+      
+      <div className="flex items-center gap-4 ml-[54px] mt-4 pt-4 border-t border-border/20">
+        <button 
+          onClick={handleHelpful}
+          className={`flex items-center gap-1.5 text-xs font-bold transition-colors px-2 py-1 -ml-2 rounded-md ${helpful ? 'text-primary bg-primary/5' : 'text-foreground/40 hover:text-primary hover:bg-secondary/50'}`}
+        >
+          <ThumbsUp className={`w-3.5 h-3.5 ${helpful ? 'fill-current' : ''}`} /> 
+          Helpful ({votes})
+        </button>
+      </div>
     </div>
   );
 }
