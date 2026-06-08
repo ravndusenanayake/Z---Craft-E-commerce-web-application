@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { MessageSquare, LogOut, LayoutDashboard, Sparkles } from 'lucide-react';
 import { logout } from '@/actions/auth';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Z Craft',
   description: 'Manage orders and inquiries for Z Craft.',
